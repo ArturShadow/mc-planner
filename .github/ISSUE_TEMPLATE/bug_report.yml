@@ -1,0 +1,93 @@
+name: Bug report
+description: Report reproducible behavior that is incorrect or unexpected.
+title: "fix: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve MC Planner. Search existing issues before submitting a duplicate, and avoid including secrets or private data.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Briefly describe the problem and its impact.
+      placeholder: Describe what is broken and who it affects.
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest reliable sequence that demonstrates the problem.
+      placeholder: |
+        1. Open ...
+        2. Select ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What should happen instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happens now? Include the exact error text when applicable.
+    validations:
+      required: true
+
+  - type: input
+    id: app-version
+    attributes:
+      label: MC Planner version
+      description: Use the displayed application version, release tag, or commit hash.
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: Operating system
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment details
+      description: Include the OS version, architecture, and any other relevant setup details.
+      placeholder: Windows 11 24H2, x64
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots, or additional context
+      description: Attach useful evidence and remove secrets or private information first.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Submission checklist
+      options:
+        - label: I searched for an existing issue that reports the same problem.
+          required: true
+        - label: I removed secrets and private information from the report and attachments.
+          required: true
+        - label: I can reproduce this problem using the steps above.
+          required: true
