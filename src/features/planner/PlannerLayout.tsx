@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { ProjectModel } from "../../models/project.model";
+import { BasePlanningView } from "../base/BasePlanningView";
 
 type PlannerTab = "base" | "processes" | "multiblocks";
 
 interface PlannerLayoutProps {
   project: ProjectModel;
   onCloseProject: () => void;
+  onProjectBaseSizeChange?: (widthChunks: number, heightChunks: number) => void;
 }
 
 const tabs: Array<{ id: PlannerTab; label: string; symbol: string }> = [
@@ -20,7 +22,7 @@ const emptyContent: Record<PlannerTab, { title: string; description: string }> =
   multiblocks: { title: "No multiblocks yet", description: "Keep track of large structures and their material requirements." },
 };
 
-export function PlannerLayout({ project, onCloseProject }: PlannerLayoutProps) {
+export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange }: PlannerLayoutProps) {
   const [activeTab, setActiveTab] = useState<PlannerTab>("base");
   const content = emptyContent[activeTab];
 
@@ -65,11 +67,11 @@ export function PlannerLayout({ project, onCloseProject }: PlannerLayoutProps) {
           <span className="planner__status">Local draft</span>
         </header>
 
-        <section className="planner__empty" aria-labelledby="planner-empty-title">
+        {activeTab === "base" ? <BasePlanningView project={project} onProjectBaseSizeChange={onProjectBaseSizeChange} /> : <section className="planner__empty" aria-labelledby="planner-empty-title">
           <div className="planner__empty-grid" aria-hidden="true"><span>◆</span></div>
           <h2 id="planner-empty-title">{content.title}</h2>
           <p>{content.description}</p>
-        </section>
+        </section>}
       </main>
     </div>
   );

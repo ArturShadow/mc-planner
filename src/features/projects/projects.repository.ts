@@ -50,3 +50,15 @@ export async function createProject(name: string): Promise<ProjectModel> {
   if (!rows[0]) throw new Error("The created project could not be loaded.");
   return mapProject(rows[0]);
 }
+
+export async function resizeProjectBase(projectId: number, widthChunks: number, heightChunks: number): Promise<void> {
+  const database = await getDatabase();
+  await database.execute(
+    "UPDATE projects SET base_width_chunks = $1, base_height_chunks = $2, updated_at = CURRENT_TIMESTAMP WHERE id = $3",
+    [widthChunks, heightChunks, projectId],
+  );
+  await database.execute(
+    "DELETE FROM base_assignments WHERE project_id = $1 AND (chunk_x >= $2 OR chunk_y >= $3)",
+    [projectId, widthChunks, heightChunks],
+  );
+}
