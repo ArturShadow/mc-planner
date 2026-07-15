@@ -44,12 +44,19 @@ function App() {
     setView("projects");
   }
 
+  function updateProjectBaseSize(widthChunks: number, heightChunks: number): void {
+    if (activeProjectId === null) return;
+    setProjects((current) => current.map((project) => project.id === activeProjectId
+      ? { ...project, baseWidthChunks: widthChunks, baseHeightChunks: heightChunks }
+      : project));
+  }
+
   const activeProject = projects.find((project) => project.id === activeProjectId);
 
   return view === "projects" || !activeProject ? (
     <ProjectsView projects={projects} isLoading={isLoading} error={error} onCreateProject={addProject} onOpenProject={openProject} onRetry={() => void loadProjects()} />
   ) : (
-    <PlannerLayout project={activeProject} onCloseProject={closeProject} />
+    <PlannerLayout project={activeProject} onCloseProject={closeProject} onProjectBaseSizeChange={updateProjectBaseSize} />
   );
 }
 
