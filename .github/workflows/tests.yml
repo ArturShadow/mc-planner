@@ -1,0 +1,52 @@
+name: Tests
+
+# El workflow se ejecuta al actualizar cualquier rama y al abrir o actualizar
+# una Pull Request. Así detectamos errores antes de mezclar cambios en main.
+on:
+  push:
+  pull_request:
+
+# Los tests solo necesitan leer el repositorio. Declarar permisos mínimos es
+# una buena práctica de seguridad para GitHub Actions.
+permissions:
+  contents: read
+
+# Si llegan varios commits seguidos a la misma rama, cancelamos la ejecución
+# anterior porque el resultado que importa es el del commit más reciente.
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend-tests:
+    name: Frontend tests and coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      # Descarga el contenido del repositorio dentro del runner temporal.
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Configura la misma versión mayor de Node usada durante el desarrollo.
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      # npm viene incluido con Node. Lo usamos únicamente para instalar pnpm;
+      # las dependencias del proyecto siguen administradas por pnpm y su lockfile.
+      - name: Install pnpm
+        run: npm install --global pnpm@11.12.0
+
+      # --frozen-lockfile hace fallar CI si package.json y pnpm-lock.yaml no
+      # coinciden, evitando instalaciones diferentes entre local y GitHub.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Ejecuta Vitest y genera el reporte. Un test fallido detiene el job.
+      - name: Run tests with coverage
+        run: pnpm coverage
+
+      # Además de los tests, comprueba TypeScript y el bundle de producción.
+      - name: Build frontend
+        run: pnpm build
