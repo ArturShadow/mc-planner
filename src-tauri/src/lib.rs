@@ -16,6 +16,8 @@ pub fn run() {
         Migration { version: 5, description: "multiblock_requirements", sql: include_str!("../migrations/005_multiblock_requirements.sql"), kind: MigrationKind::Up },
         Migration { version: 6, description: "indexes", sql: include_str!("../migrations/006_indexes.sql"), kind: MigrationKind::Up },
         Migration { version: 7, description: "seed", sql: include_str!("../migrations/007_seed.sql"), kind: MigrationKind::Up },
+        Migration { version: 8, description: "process_editor", sql: include_str!("../migrations/008_process_editor.sql"), kind: MigrationKind::Up },
+        Migration { version: 9, description: "base_assignment_groups", sql: include_str!("../migrations/009_base_assignment_groups.sql"), kind: MigrationKind::Up },
     ];
 
     tauri::Builder::default()

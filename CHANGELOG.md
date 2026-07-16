@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Repository contribution, branching, testing, code, CSS, changelog, and release guidelines.
+- A 2D process editor with rectangular chunk grids, grouped catalog tools, multiblock footprints, and persistent placements.
 
 ## [0.1.0]
 

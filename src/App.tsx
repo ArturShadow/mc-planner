@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { PlannerLayout } from "./features/planner/PlannerLayout";
 import { ProjectsView } from "./features/projects/ProjectsView";
 import { createProject, listProjects } from "./features/projects/projects.repository";
+import type { CreateProjectInput } from "./features/projects/projects.repository";
 import type { ProjectModel } from "./models/project.model";
 import "./App.css";
 
@@ -33,8 +34,8 @@ function App() {
     setView("planner");
   }
 
-  async function addProject(name: string): Promise<void> {
-    const project = await createProject(name);
+  async function addProject(input: CreateProjectInput): Promise<void> {
+    const project = await createProject(input);
     setProjects((current) => [project, ...current]);
     openProject(project.id);
   }

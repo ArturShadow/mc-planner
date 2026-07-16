@@ -1,8 +1,10 @@
 import { useState } from "react";
 import type { ProjectModel } from "../../models/project.model";
 import { BasePlanningView } from "../base/BasePlanningView";
+import { ProcessView } from "../processes/ProcessView";
 
 type PlannerTab = "base" | "processes" | "multiblocks";
+interface ProcessNavigationRequest { processId: number | null; nonce: number }
 
 interface PlannerLayoutProps {
   project: ProjectModel;
@@ -24,21 +26,29 @@ const emptyContent: Record<PlannerTab, { title: string; description: string }> =
 
 export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange }: PlannerLayoutProps) {
   const [activeTab, setActiveTab] = useState<PlannerTab>("base");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [processNavigation, setProcessNavigation] = useState<ProcessNavigationRequest | null>(null);
   const content = emptyContent[activeTab];
 
+  function openProcess(processId: number | null): void {
+    setProcessNavigation({ processId, nonce: Date.now() });
+    setActiveTab("processes");
+  }
+
   return (
-    <div className="planner">
-      <aside className="planner__sidebar">
+    <div className={`planner${isSidebarOpen ? "" : " planner--sidebar-collapsed"}`}>
+      <aside className={`planner__sidebar${isSidebarOpen ? "" : " planner__sidebar--collapsed"}`}>
         <div className="planner__brand">
           <span className="planner__brand-mark" aria-hidden="true">◆</span>
-          <span>MC Planner</span>
+          {isSidebarOpen && <span>MC Planner</span>}
+          <button className="planner__sidebar-toggle" type="button" aria-label={isSidebarOpen ? "Collapse main menu" : "Expand main menu"} title={isSidebarOpen ? "Collapse main menu" : "Expand main menu"} onClick={() => setIsSidebarOpen((current) => !current)}>{isSidebarOpen ? "‹" : "›"}</button>
         </div>
 
-        <div className="planner__project">
+        {isSidebarOpen && <div className="planner__project">
           <span className="planner__project-label">Current project</span>
           <strong>{project.name}</strong>
           <small>{project.baseWidthChunks} × {project.baseHeightChunks} chunks</small>
-        </div>
+        </div>}
 
         <nav className="planner__nav" aria-label="Planner sections">
           {tabs.map((tab) => (
@@ -46,16 +56,17 @@ export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange
               key={tab.id}
               className={`planner__nav-item${activeTab === tab.id ? " planner__nav-item--active" : ""}`}
               type="button"
+              aria-label={tab.label}
               aria-current={activeTab === tab.id ? "page" : undefined}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => { if (tab.id === "processes") setProcessNavigation(null); setActiveTab(tab.id); }}
             >
               <span aria-hidden="true">{tab.symbol}</span>
-              {tab.label}
+              {isSidebarOpen && tab.label}
             </button>
           ))}
         </nav>
 
-        <button className="planner__back" type="button" onClick={onCloseProject}>← All projects</button>
+        <button className="planner__back" type="button" title="All projects" aria-label="All projects" onClick={onCloseProject}>←{isSidebarOpen && " All projects"}</button>
       </aside>
 
       <main className="planner__main">
@@ -67,7 +78,7 @@ export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange
           <span className="planner__status">Local draft</span>
         </header>
 
-        {activeTab === "base" ? <BasePlanningView project={project} onProjectBaseSizeChange={onProjectBaseSizeChange} /> : <section className="planner__empty" aria-labelledby="planner-empty-title">
+        {activeTab === "base" ? <BasePlanningView project={project} onProjectBaseSizeChange={onProjectBaseSizeChange} onOpenProcess={openProcess} /> : activeTab === "processes" ? <ProcessView project={project} navigationRequest={processNavigation} /> : <section className="planner__empty" aria-labelledby="planner-empty-title">
           <div className="planner__empty-grid" aria-hidden="true"><span>◆</span></div>
           <h2 id="planner-empty-title">{content.title}</h2>
           <p>{content.description}</p>

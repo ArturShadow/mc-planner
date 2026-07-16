@@ -20,6 +20,9 @@ const savedProject: ProjectModel = {
   name: "Technical survival",
   baseWidthChunks: 3,
   baseHeightChunks: 3,
+  survivalType: "vanilla",
+  minecraftVersion: "",
+  includeVanilla: true,
   createdAt: "2026-07-13 20:00:00",
   updatedAt: "2026-07-13 20:00:00",
 };
@@ -73,6 +76,6 @@ describe("App project flow", () => {
     // ve el usuario y qué dato se envió al repositorio.
     expect(await screen.findByRole("heading", { name: "Base" })).toBeInTheDocument();
     expect(screen.getByText(savedProject.name)).toBeInTheDocument();
-    expect(mockedCreateProject).toHaveBeenCalledWith(savedProject.name);
+    expect(mockedCreateProject).toHaveBeenCalledWith({ name: savedProject.name, survivalType: "vanilla", minecraftVersion: "", includeVanilla: true });
   });
 });
