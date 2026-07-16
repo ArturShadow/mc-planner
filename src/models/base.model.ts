@@ -4,4 +4,5 @@ export interface BaseAssignmentModel {
   processId: number | null;
   chunkX: number;
   chunkY: number;
+  assignmentGroup: string | null;
 }

@@ -1,11 +1,12 @@
 import { FormEvent, useState } from "react";
-import type { ProjectModel } from "../../models/project.model";
+import type { ProjectModel, SurvivalType } from "../../models/project.model";
+import type { CreateProjectInput } from "./projects.repository";
 
 interface ProjectsViewProps {
   projects: ProjectModel[];
   isLoading: boolean;
   error: string | null;
-  onCreateProject: (name: string) => Promise<void>;
+  onCreateProject: (input: CreateProjectInput) => Promise<void>;
   onOpenProject: (projectId: number) => void;
   onRetry: () => void;
 }
@@ -13,6 +14,9 @@ interface ProjectsViewProps {
 export function ProjectsView({ projects, isLoading, error, onCreateProject, onOpenProject, onRetry }: ProjectsViewProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
+  const [survivalType, setSurvivalType] = useState<SurvivalType>("vanilla");
+  const [minecraftVersion, setMinecraftVersion] = useState("");
+  const [includeVanilla, setIncludeVanilla] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -20,6 +24,9 @@ export function ProjectsView({ projects, isLoading, error, onCreateProject, onOp
     if (isCreating) return;
     setIsDialogOpen(false);
     setProjectName("");
+    setSurvivalType("vanilla");
+    setMinecraftVersion("");
+    setIncludeVanilla(true);
     setCreateError(null);
   }
 
@@ -29,7 +36,7 @@ export function ProjectsView({ projects, isLoading, error, onCreateProject, onOp
     setIsCreating(true);
     setCreateError(null);
     try {
-      await onCreateProject(projectName);
+      await onCreateProject({ name: projectName, survivalType, minecraftVersion, includeVanilla: survivalType === "modpack" ? includeVanilla : true });
       setIsDialogOpen(false);
       setProjectName("");
     } catch (cause) {
@@ -60,7 +67,10 @@ export function ProjectsView({ projects, isLoading, error, onCreateProject, onOp
 
       {isDialogOpen && <div className="dialog-backdrop" role="presentation" onMouseDown={closeDialog}><section className="dialog" role="dialog" aria-modal="true" aria-labelledby="create-project-title" onMouseDown={(event) => event.stopPropagation()}>
         <div className="dialog__header"><div><p className="dialog__eyebrow">New world plan</p><h2 id="create-project-title">Create project</h2></div><button className="dialog__close" type="button" onClick={closeDialog} aria-label="Close dialog">×</button></div>
-        <form className="dialog__form" onSubmit={(event) => void submitProject(event)}><label className="field"><span className="field__label">Project name</span><input className="field__input" value={projectName} onChange={(event) => setProjectName(event.target.value)} placeholder="My survival world" autoFocus disabled={isCreating} /></label>
+        <form className="dialog__form project-form" onSubmit={(event) => void submitProject(event)}><label className="field"><span className="field__label">Project name</span><input className="field__input" value={projectName} onChange={(event) => setProjectName(event.target.value)} placeholder="My survival world" autoFocus disabled={isCreating} /></label>
+          <label className="field"><span className="field__label">Survival type</span><select className="field__input" value={survivalType} disabled={isCreating} onChange={(event) => setSurvivalType(event.target.value as SurvivalType)}><option value="vanilla">Vanilla</option><option value="technical_vanilla">Technical Vanilla</option><option value="modpack">Modpack</option></select></label>
+          <label className="field"><span className="field__label">Minecraft version</span><input className="field__input" value={minecraftVersion} onChange={(event) => setMinecraftVersion(event.target.value)} placeholder="e.g. 1.21.1" disabled={isCreating} /></label>
+          {survivalType === "modpack" && <label className="project-form__check"><input type="checkbox" checked={includeVanilla} onChange={(event) => setIncludeVanilla(event.target.checked)} disabled={isCreating} /> Include Vanilla catalog</label>}
           {createError && <p className="dialog__error" role="alert">{createError}</p>}<div className="dialog__actions"><button className="button button--secondary" type="button" onClick={closeDialog} disabled={isCreating}>Cancel</button><button className="button button--primary" type="submit" disabled={!projectName.trim() || isCreating}>{isCreating ? "Creating…" : "Create project"}</button></div>
         </form>
       </section></div>}
