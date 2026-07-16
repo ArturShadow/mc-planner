@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { CSSProperties, FormEvent } from "react";
-import type { CatalogCategory, CatalogItemModel } from "../../models/catalog.model";
+import type { CatalogItemModel } from "../../models/catalog.model";
 import type { MultiblockModel } from "../../models/multiblock.model";
 import type { ProcessPlacement } from "../../models/process-placement.model";
 import type { ProcessModel } from "../../models/process.model";
@@ -8,6 +8,7 @@ import type { ProjectModel } from "../../models/project.model";
 import { listCompatibleCatalog, listMultiblocks } from "../catalog/catalog.repository";
 import { createPlacement, deletePlacement, listProcessPlacements } from "./process-placements.repository";
 import { createProcess, deleteProcess, listProcesses, updateProcess } from "./processes.repository";
+import { ProcessToolPalette } from "./ProcessToolPalette";
 
 interface ProcessViewProps {
   project: ProjectModel;
@@ -17,11 +18,6 @@ interface ProcessFormState { name: string; color: string; widthChunks: number; h
 type SelectedElement = { type: "catalog_item"; item: CatalogItemModel } | { type: "multiblock"; multiblock: MultiblockModel } | { type: "erase" };
 
 const emptyForm: ProcessFormState = { name: "", color: "#8fd694", widthChunks: 1, heightChunks: 1 };
-const categoryGroups: Array<{ category: CatalogCategory; label: string }> = [
-  { category: "block", label: "Blocks" }, { category: "cable", label: "Cables" },
-  { category: "pipe", label: "Pipes" }, { category: "tool", label: "Tools" },
-];
-
 function placementAt(placements: ProcessPlacement[], x: number, z: number): ProcessPlacement | undefined {
   return placements.find((placement) => x >= placement.originX && x < placement.originX + placement.widthBlocks
     && z >= placement.originZ && z < placement.originZ + placement.depthBlocks);
@@ -165,13 +161,7 @@ export function ProcessView({ project, navigationRequest }: ProcessViewProps) {
           </div>
           <div className="process-view__toolbar">
             <div><strong>{activeProcess.name}</strong><span>{widthBlocks} × {depthBlocks} blocks · {placements.length} placements</span></div>
-            <label className="field"><span className="field__label">Placement tool</span><select aria-label="Placement tool" className="field__input" value={selectedValue} onChange={(event) => setSelectedValue(event.target.value)}>
-              <option value="">Select an element…</option>
-              <optgroup label="Editing"><option value="erase">Erase placement</option></optgroup>
-              <optgroup label="Blocks">{catalog.filter((item) => item.category === "block").map((item) => <option key={item.id} value={`catalog:${item.id}`}>{item.name}</option>)}</optgroup>
-              <optgroup label="Multiblocks">{multiblocks.map((item) => <option key={item.id} value={`multiblock:${item.id}`}>{item.name} ({item.widthBlocks}×{item.depthBlocks})</option>)}</optgroup>
-              {categoryGroups.slice(1).map((group) => <optgroup key={group.category} label={group.label}>{catalog.filter((item) => item.category === group.category).map((item) => <option key={item.id} value={`catalog:${item.id}`}>{item.name}</option>)}</optgroup>)}
-            </select></label>
+            <ProcessToolPalette catalog={catalog} multiblocks={multiblocks} value={selectedValue} onChange={setSelectedValue} />
           </div>
           {!catalog.length && <p className="process-view__catalog-note">The item catalog is empty. Multiblocks and the erase tool remain available; Vanilla data and JAR imports will be added later.</p>}
           {error && <p className="process-view__error" role="alert">{error}</p>}

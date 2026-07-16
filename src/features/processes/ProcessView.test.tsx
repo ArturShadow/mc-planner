@@ -25,17 +25,22 @@ describe("ProcessView", () => {
     vi.mocked(deletePlacement).mockResolvedValue();
   });
 
-  it("renders a 16 by 16 grid and every placement group", async () => {
-    const { container } = render(<ProcessView project={project} navigationRequest={{ processId: 4, nonce: 1 }} />);
+  it("renders a 16 by 16 grid and the visual tool palette", async () => {
+    const user = userEvent.setup();
+    render(<ProcessView project={project} navigationRequest={{ processId: 4, nonce: 1 }} />);
     expect(await screen.findByRole("grid", { name: /16 by 16 block grid/ })).toBeInTheDocument();
     expect(screen.getAllByRole("gridcell")).toHaveLength(256);
-    expect(Array.from(container.querySelectorAll("optgroup")).map((group) => group.label)).toEqual(["Editing", "Blocks", "Multiblocks", "Cables", "Pipes", "Tools"]);
+    expect(screen.getByRole("toolbar", { name: "Process editing tools" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Select placement element" }));
+    expect(screen.getByRole("region", { name: "Multiblocks" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Blocks" })).toBeInTheDocument();
   });
 
   it("places a selected multiblock using its complete footprint", async () => {
     const user = userEvent.setup();
     render(<ProcessView project={project} navigationRequest={{ processId: 4, nonce: 1 }} />);
-    await user.selectOptions(await screen.findByLabelText("Placement tool"), "multiblock:20");
+    await user.click(await screen.findByRole("button", { name: "Select placement element" }));
+    await user.click(screen.getByRole("option", { name: /Water Pump/ }));
     await user.click(screen.getByRole("gridcell", { name: "Block 2, 3: Empty" }));
     await waitFor(() => expect(createPlacement).toHaveBeenCalledWith(expect.objectContaining({ processId: 4, originX: 2, originZ: 3, widthBlocks: 4, depthBlocks: 3 })));
     expect(screen.getByRole("gridcell", { name: "Block 5, 5: Water Pump" })).toBeInTheDocument();
