@@ -1,6 +1,7 @@
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import "primeicons/primeicons.css";
+import "primereact/resources/themes/lara-dark-green/theme.css";
 import "primereact/resources/primereact.min.css";
 import "./App.css";
 import "./styles/primereact.css";

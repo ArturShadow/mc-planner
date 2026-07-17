@@ -8,7 +8,11 @@ use zip::ZipArchive;
 pub struct ImportedBlock {
     pub name: String,
     pub item_identifier: String,
+    #[serde(default = "default_category")]
+    pub category: String,
 }
+
+fn default_category() -> String { "block".into() }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -84,7 +88,10 @@ fn analyze_jar(path: &Path, locale: &str) -> JarAnalysis {
     let mut names = read_language(&mut archive, "en_us");
     if locale != "en_us" { names.extend(read_language(&mut archive, locale)); }
     if names.is_empty() { warnings.push(format!("No block translations were found for {locale} or en_us.")); }
-    let blocks = names.into_iter().map(|(identifier, name)| ImportedBlock { name, item_identifier: identifier }).collect();
+    let blocks = names.into_iter().map(|(identifier, name)| {
+        let category = classify_block(&identifier, &name).into();
+        ImportedBlock { name, item_identifier: identifier, category }
+    }).collect();
     JarAnalysis {
         path: path.to_string_lossy().into_owned(), file_name, content_hash,
         mod_id: metadata.id, mod_name: metadata.name, mod_version: metadata.version,
@@ -138,15 +145,29 @@ fn read_language<R: Read + Seek>(archive: &mut ZipArchive<R>, locale: &str) -> B
         let Some(raw) = read_entry(archive, &entry_name) else { continue };
         let Ok(entries) = serde_json::from_str::<BTreeMap<String, String>>(&raw) else { continue };
         for (key, value) in entries {
-            let mut parts = key.splitn(3, '.');
-            if parts.next() == Some("block") {
-                if let (Some(namespace), Some(id)) = (parts.next(), parts.next()) {
-                    blocks.insert(format!("{namespace}:{id}"), value);
+            let parts: Vec<_> = key.split('.').collect();
+            if let ["block", namespace, id] = parts.as_slice() {
+                if !value.trim().is_empty() {
+                    blocks.insert(format!("{namespace}:{id}"), value.trim().to_owned());
                 }
             }
         }
     }
     blocks
+}
+
+fn classify_block(identifier: &str, _name: &str) -> &'static str {
+    let path = identifier.split_once(':').map_or(identifier, |(_, path)| path);
+    let words = path.split(|character: char| !character.is_ascii_alphanumeric());
+
+    for word in words {
+        match word.to_ascii_lowercase().as_str() {
+            "cable" | "cables" | "wire" | "wires" | "kabel" => return "cable",
+            "pipe" | "pipes" | "tube" | "tubes" | "duct" | "ducts" => return "pipe",
+            _ => {}
+        }
+    }
+    "block"
 }
 
 #[cfg(test)]
@@ -176,6 +197,7 @@ mod tests {
         assert_eq!(result.mod_id, "example");
         assert_eq!(result.blocks[0].name, "Máquina");
         assert_eq!(result.blocks[0].item_identifier, "example:machine");
+        assert_eq!(result.blocks[0].category, "block");
     }
 
     #[test]
@@ -219,5 +241,28 @@ version="2.0"
         let file = jar(&[("fabric.mod.json", r#"{"id":"library","name":"Library","version":"1"}"#)]);
         let result = scan_mod_jars(vec![file.path().to_string_lossy().into()], "en_us".into());
         assert!(result.is_empty());
+    }
+
+    #[test]
+    fn ignores_block_tooltips_and_other_nested_translation_keys() {
+        let file = jar(&[
+            ("fabric.mod.json", r#"{"id":"example","name":"Example Mod","version":"1"}"#),
+            ("assets/example/lang/en_us.json", r#"{
+                "block.example.machine":"Machine",
+                "block.example.machine.tooltip":"Machine description",
+                "block.example.machine.guide.page":"Guide text"
+            }"#),
+        ]);
+        let result = analyze_jar(file.path(), "en_us");
+        assert_eq!(result.blocks.len(), 1);
+        assert_eq!(result.blocks[0].item_identifier, "example:machine");
+    }
+
+    #[test]
+    fn classifies_cables_and_pipes_without_treating_machines_as_tools() {
+        assert_eq!(classify_block("example:network_cable", "Network Cable"), "cable");
+        assert_eq!(classify_block("example:fluid_pipe", "Fluid Pipe"), "pipe");
+        assert_eq!(classify_block("example:forge_hammer", "Forge Hammer"), "block");
+        assert_eq!(classify_block("example:wiremill", "Wire Factory"), "block");
     }
 }

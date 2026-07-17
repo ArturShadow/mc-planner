@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Exclude tooltip and guide text from mod block imports and classify imported cables and pipes correctly.
+
 ### Added
 
 - A catalog workspace that previews and imports localized block names from Fabric, Forge, and NeoForge JAR files or mods folders.

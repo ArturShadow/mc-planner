@@ -17,8 +17,10 @@ export interface ImportPreviewRow extends JarAnalysis {
 interface ImportPreviewTableProps {
   rows: ImportPreviewRow[];
   selectedKeys: Record<string, boolean>;
+  query: string;
   statusFilter: ImportStatusFilter;
   onSelectionChange: (keys: Record<string, boolean>) => void;
+  onQueryChange: (value: string) => void;
   onStatusFilterChange: (value: ImportStatusFilter) => void;
 }
 
@@ -33,8 +35,10 @@ const STATUS_OPTIONS = [
 export function ImportPreviewTable({
   rows,
   selectedKeys,
+  query,
   statusFilter,
   onSelectionChange,
+  onQueryChange,
   onStatusFilterChange,
 }: ImportPreviewTableProps) {
   const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows>({});
@@ -45,22 +49,28 @@ export function ImportPreviewTable({
     onSelectionChange(Object.fromEntries(selection.filter((row) => !row.disabled).map((row) => [row.rowKey, true])));
   }
 
-  return <>
-    <label className="field">
-      <span className="field__label">Status</span>
-      <Dropdown
-        className="mc-select"
-        panelClassName="mc-select__popup"
-        value={statusFilter}
-        options={STATUS_OPTIONS}
-        optionLabel="label"
-        optionValue="value"
-        filter
-        filterPlaceholder="Filter statuses"
-        aria-label="Filter imports by status"
-        onChange={(event: DropdownChangeEvent) => onStatusFilterChange(event.value as ImportStatusFilter)}
-      />
-    </label>
+  return <div className="import-preview-table">
+    <div className="import-preview-table__filters">
+      <label className="field">
+        <span className="field__label">Search mods</span>
+        <input className="field__input" value={query} onChange={(event) => onQueryChange(event.target.value)} />
+      </label>
+      <label className="field">
+        <span className="field__label">Status</span>
+        <Dropdown
+          className="mc-select"
+          panelClassName="mc-select__popup"
+          value={statusFilter}
+          options={STATUS_OPTIONS}
+          optionLabel="label"
+          optionValue="value"
+          filter
+          filterPlaceholder="Filter statuses"
+          aria-label="Filter imports by status"
+          onChange={(event: DropdownChangeEvent) => onStatusFilterChange(event.value as ImportStatusFilter)}
+        />
+      </label>
+    </div>
 
     <DataTable
       className="mc-datatable"
@@ -81,17 +91,17 @@ export function ImportPreviewTable({
       emptyMessage="No mods match these filters."
       stripedRows
       removableSort
-      tableStyle={{ minWidth: "820px" }}
+      tableStyle={{ minWidth: "860px", tableLayout: "fixed" }}
     >
-      <Column expander className="mc-datatable__toggle-column" />
-      <Column selectionMode="multiple" className="mc-datatable__select-column" />
-      <Column field="modName" header="Mod" body={(row: ImportPreviewRow) => <><strong>{row.modName}</strong><small>{row.modId} · {row.modVersion}</small></>} />
-      <Column field="fileName" header="File" />
-      <Column field="newCount" header="New" body={(row: ImportPreviewRow) => <><strong>{row.newCount}</strong><small>new</small></>} />
-      <Column field="duplicateCount" header="Duplicates" body={(row: ImportPreviewRow) => <><strong>{row.duplicateCount}</strong><small>duplicates</small></>} />
-      <Column header="Status" body={(row: ImportPreviewRow) => <ImportStatus row={row} />} />
+      <Column expander className="mc-datatable__toggle-column" headerClassName="mc-datatable__toggle-column" />
+      <Column selectionMode="multiple" className="mc-datatable__select-column" headerClassName="mc-datatable__select-column" />
+      <Column field="modName" header="Mod" className="mc-datatable__mod-column" body={(row: ImportPreviewRow) => <div className="mc-datatable__identity"><strong>{row.modName}</strong><small>{row.modId} · {row.modVersion}</small></div>} />
+      <Column field="fileName" header="File" className="mc-datatable__file-column" body={(row: ImportPreviewRow) => <span title={row.fileName}>{row.fileName}</span>} />
+      <Column field="newCount" header="New" className="mc-datatable__number-column" body={(row: ImportPreviewRow) => <div><strong>{row.newCount}</strong><small>new</small></div>} />
+      <Column field="duplicateCount" header="Duplicates" className="mc-datatable__number-column" body={(row: ImportPreviewRow) => <div><strong>{row.duplicateCount}</strong><small>duplicates</small></div>} />
+      <Column header="Status" className="mc-datatable__status-column" body={(row: ImportPreviewRow) => <ImportStatus row={row} />} />
     </DataTable>
-  </>;
+  </div>;
 }
 
 function ExpandedBlocks({ row }: { row: ImportPreviewRow }) {
@@ -103,7 +113,7 @@ function ExpandedBlocks({ row }: { row: ImportPreviewRow }) {
     {row.warnings.map((warning) => <p className="mc-datatable__message" key={warning}>{warning}</p>)}
     {visibleBlocks.map((block) =>
       <div className="mc-datatable__block" key={block.itemIdentifier}>
-        <strong>{block.name}</strong>
+        <strong>{block.name} <small>· {block.category}</small></strong>
         <code>{block.itemIdentifier}</code>
       </div>)}
     {visibleCount < row.blocks.length &&

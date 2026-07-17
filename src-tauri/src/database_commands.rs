@@ -55,8 +55,8 @@ pub async fn import_catalog_jars(
             let result = sqlx::query(
                 r#"INSERT OR IGNORE INTO item_catalog
                   (name, mod_name, item_identifier, category, minecraft_version, source_type, source_id)
-                 VALUES (?, ?, ?, 'block', ?, 'mod', ?)"#,
-            ).bind(block.name).bind(&analysis.mod_name).bind(block.item_identifier)
+                 VALUES (?, ?, ?, ?, ?, 'mod', ?)"#,
+            ).bind(block.name).bind(&analysis.mod_name).bind(block.item_identifier).bind(block.category)
                 .bind(if minecraft_version.is_empty() { None } else { Some(minecraft_version.as_str()) })
                 .bind(&analysis.mod_id).execute(&mut *tx).await.map_err(|error| error.to_string())?;
             imported += result.rows_affected();

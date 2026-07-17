@@ -156,8 +156,12 @@ export function CatalogView({ project }: CatalogViewProps) {
   }
 
   const rows = useMemo(() => analyses.filter((item) => {
-    const text = `${item.fileName} ${item.modName} ${item.modId}`.toLowerCase();
-    if (!text.includes(query.trim().toLowerCase())) return false;
+    const normalizedQuery = query.trim().toLowerCase();
+    const modText = `${item.fileName} ${item.modName} ${item.modId}`.toLowerCase();
+    const matchesBlock = normalizedQuery.length > 0 && item.blocks.some((block) =>
+      `${block.name} ${block.itemIdentifier}`.toLowerCase().includes(normalizedQuery),
+    );
+    if (normalizedQuery && !modText.includes(normalizedQuery) && !matchesBlock) return false;
     if (statusFilter === "error") return Boolean(item.error);
     if (statusFilter === "warning") return item.warnings.length > 0;
     if (statusFilter === "new") return !item.error && !isExact(item) && newCount(item) > 0;
@@ -191,7 +195,7 @@ export function CatalogView({ project }: CatalogViewProps) {
     {error && <p className="catalog-view__notice catalog-view__notice--error" role="alert">{error}</p>}
     {analyses.length > 0 && <section className="catalog-preview" aria-labelledby="catalog-preview-title">
       <div className="catalog-preview__header"><div><h3 id="catalog-preview-title">Import preview</h3><p>{selectedNewCount} new block{selectedNewCount === 1 ? "" : "s"} selected</p></div><div className="catalog-preview__actions"><button className="button button--secondary" type="button" disabled={isBusy} onClick={() => void exportManifest()}>Export analysis JSON</button><button className="button button--primary" type="button" disabled={isBusy || selectedNewCount === 0} onClick={() => void saveImport()}>Import selected</button></div></div>
-      <div className="catalog-preview__filters"><label className="field"><span className="field__label">Search mods</span><input className="field__input" value={query} onChange={(event) => setQuery(event.target.value)} /></label><ImportPreviewTable rows={previewRows} selectedKeys={selectionKeys} statusFilter={statusFilter} onStatusFilterChange={setStatusFilter} onSelectionChange={(keys) => setSelectedMods(new Set(Object.keys(keys).filter((key) => keys[key])))} /></div>
+      <ImportPreviewTable rows={previewRows} selectedKeys={selectionKeys} query={query} statusFilter={statusFilter} onQueryChange={setQuery} onStatusFilterChange={setStatusFilter} onSelectionChange={(keys) => setSelectedMods(new Set(Object.keys(keys).filter((key) => keys[key])))} />
       {!rows.length && <p className="catalog-preview__empty">No mods match these filters.</p>}
     </section>}
     <div className="catalog-view__lists"><section><h3>Imported sources</h3>{sources.length ? <ul>{sources.map((source) => <li key={source.id}><strong>{source.displayName}</strong><span>{source.modVersion || source.sourceIdentifier}</span></li>)}</ul> : <p>No mod sources imported yet.</p>}</section><section className="multiblock-list"><div className="multiblock-list__header"><h3>Multiblocks</h3><button className="button button--secondary" type="button" onClick={() => setIsMultiblockFormOpen(true)}>New multiblock</button></div>{multiblocks.length ? <ul>{multiblocks.map((item) => <li className="multiblock-list__item" key={item.id}><div><div><strong>{item.name}</strong><span>{item.widthBlocks} × {item.depthBlocks} × {item.heightBlocks}{item.canShareWalls ? " · Shared walls" : ""}</span></div><div className="multiblock-list__actions"><button type="button" onClick={() => editMultiblock(item)}>Edit</button><button type="button" onClick={() => void removeMultiblock(item)}>Delete</button></div></div>{item.requirements.length ? <ul className="multiblock-list__requirements">{item.requirements.map((requirement) => <li key={requirement.id}><span>{requirement.item.name}</span><strong>× {requirement.quantity}</strong></li>)}</ul> : <small>No block requirements</small>}</li>)}</ul> : <p>No multiblocks yet.</p>}</section></div>

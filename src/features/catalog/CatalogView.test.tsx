@@ -27,7 +27,7 @@ describe("CatalogView", () => {
     vi.mocked(open).mockResolvedValue(["C:\\mods\\example.jar"]);
     vi.mocked(invoke).mockImplementation((command) => command === "collect_mod_jar_paths"
       ? Promise.resolve(["C:\\mods\\example.jar"])
-      : Promise.resolve([{ path: "C:\\mods\\example.jar", fileName: "example.jar", contentHash: "abc", modId: "example", modName: "Example Mod", modVersion: "1.0", warnings: [], error: null, blocks: [{ name: "Old Machine", itemIdentifier: "example:old_machine" }, { name: "New Machine", itemIdentifier: "example:new_machine" }] }])) as typeof invoke;
+      : Promise.resolve([{ path: "C:\\mods\\example.jar", fileName: "example.jar", contentHash: "abc", modId: "example", modName: "Example Mod", modVersion: "1.0", warnings: [], error: null, blocks: [{ name: "Old Machine", itemIdentifier: "example:old_machine", category: "block" }, { name: "New Machine", itemIdentifier: "example:new_machine", category: "block" }] }])) as typeof invoke;
     vi.mocked(importJarAnalyses).mockResolvedValue(1);
     vi.mocked(createMultiblock).mockResolvedValue();
     vi.mocked(updateMultiblock).mockResolvedValue();
@@ -40,7 +40,7 @@ describe("CatalogView", () => {
     await user.click(screen.getByRole("button", { name: "Select JAR files" }));
     expect(await screen.findByRole("heading", { name: "Import preview" })).toBeInTheDocument();
     expect(screen.getByText("1 new block selected")).toBeInTheDocument();
-    await user.click(screen.getByText("Example Mod"));
+    await user.click(screen.getByRole("button", { name: /^Expand / }));
     expect(screen.getByText("example:new_machine")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Import selected" }));
     await waitFor(() => expect(importJarAnalyses).toHaveBeenCalledWith(project, [expect.objectContaining({ modId: "example" })]));
@@ -52,8 +52,8 @@ describe("CatalogView", () => {
     const user = userEvent.setup();
     render(<CatalogView project={project} />);
     await user.click(screen.getByRole("button", { name: "Select JAR files" }));
-    expect(await screen.findByText("Already imported")).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Import Example Mod" })).toBeDisabled();
+    expect(await screen.findByText("Imported")).toBeInTheDocument();
+    expect(screen.getAllByRole("checkbox").some((checkbox) => checkbox.hasAttribute("disabled"))).toBe(true);
   });
 
   it("creates a multiblock with manually selected block quantities", async () => {

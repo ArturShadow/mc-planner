@@ -31,6 +31,7 @@ export interface CatalogImportContract {
 export interface ImportedBlockCandidate {
   name: string;
   itemIdentifier: string;
+  category: CatalogCategory;
 }
 
 export interface JarAnalysis {
