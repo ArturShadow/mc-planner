@@ -1,6 +1,7 @@
 import React, { Component, type ErrorInfo, type ReactNode } from "react";
 import ReactDOM from "react-dom/client";
 import "primeicons/primeicons.css";
+import "primereact/resources/primereact.min.css";
 import "./App.css";
 import "./styles/primereact.css";
 
@@ -31,6 +32,7 @@ class StartupBoundary extends Component<StartupBoundaryProps, StartupBoundarySta
 
 function StartupError({ error }: { error: unknown }) {
   const message = error instanceof Error ? error.message : String(error);
+  document.title = `MC Planner error: ${message}`;
   return <main className="startup-error" role="alert">
     <p className="startup-error__eyebrow">MC Planner</p>
     <h1>Application startup failed</h1>
@@ -40,6 +42,14 @@ function StartupError({ error }: { error: unknown }) {
 }
 
 const rootElement = document.getElementById("root");
+
+window.addEventListener("error", (event) => {
+  document.title = `MC Planner error: ${event.message}`;
+});
+window.addEventListener("unhandledrejection", (event) => {
+  const message = event.reason instanceof Error ? event.reason.message : String(event.reason);
+  document.title = `MC Planner error: ${message}`;
+});
 
 if (!rootElement) {
   document.body.textContent = "MC Planner could not find its root element.";

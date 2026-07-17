@@ -1,6 +1,7 @@
-import { DataTable } from "primereact/datatable";
-import { Select } from "primereact/select";
-import { type SyntheticEvent, useState } from "react";
+import { useMemo, useState } from "react";
+import { Column } from "primereact/column";
+import { DataTable, type DataTableExpandedRows, type DataTableSelectionMultipleChangeEvent } from "primereact/datatable";
+import { Dropdown, type DropdownChangeEvent } from "primereact/dropdown";
 import type { JarAnalysis } from "../../models/catalog.model";
 
 export type ImportStatusFilter = "all" | "new" | "duplicate" | "warning" | "error";
@@ -21,25 +22,6 @@ interface ImportPreviewTableProps {
   onStatusFilterChange: (value: ImportStatusFilter) => void;
 }
 
-interface SelectionRenderProps {
-  isAllSelected: boolean;
-  isSomeSelected: boolean;
-  isSelected: boolean;
-  toggleAll: (event: SyntheticEvent) => void;
-  toggle: (event: SyntheticEvent) => void;
-}
-
-interface PaginationRenderProps {
-  page: number;
-  pageCount: number;
-  rows: number;
-  totalRecords: number;
-  canPrev: boolean;
-  canNext: boolean;
-  onPageChange: (event: SyntheticEvent, page: number) => void;
-  onRowsChange: (event: SyntheticEvent, rows: number) => void;
-}
-
 const STATUS_OPTIONS = [
   { label: "All", value: "all" },
   { label: "Has new blocks", value: "new" },
@@ -55,131 +37,60 @@ export function ImportPreviewTable({
   onSelectionChange,
   onStatusFilterChange,
 }: ImportPreviewTableProps) {
+  const [expandedRows, setExpandedRows] = useState<DataTableExpandedRows>({});
+  const selectedRows = useMemo(() => rows.filter((row) => selectedKeys[row.rowKey]), [rows, selectedKeys]);
+
+  function handleSelection(event: DataTableSelectionMultipleChangeEvent<ImportPreviewRow[]>): void {
+    const selection = event.value as ImportPreviewRow[];
+    onSelectionChange(Object.fromEntries(selection.filter((row) => !row.disabled).map((row) => [row.rowKey, true])));
+  }
+
   return <>
     <label className="field">
       <span className="field__label">Status</span>
-      <Select.Root
+      <Dropdown
         className="mc-select"
+        panelClassName="mc-select__popup"
         value={statusFilter}
         options={STATUS_OPTIONS}
         optionLabel="label"
         optionValue="value"
         filter
-        ariaLabel="Filter imports by status"
-        onValueChange={(event: { value: unknown }) => onStatusFilterChange(event.value as ImportStatusFilter)}
-      >
-        <Select.Trigger className="mc-select__trigger">
-          <Select.Value />
-          <Select.Indicator className="mc-select__indicator">
-            <i className="pi pi-chevron-down" aria-hidden="true" />
-          </Select.Indicator>
-        </Select.Trigger>
-        <Select.Portal>
-          <Select.Positioner className="mc-select__positioner">
-            <Select.Popup className="mc-select__popup">
-              <Select.Filter className="mc-select__filter" placeholder="Filter statuses" />
-              <Select.List className="mc-select__list" />
-              <Select.Empty className="mc-select__empty">No status found.</Select.Empty>
-            </Select.Popup>
-          </Select.Positioner>
-        </Select.Portal>
-      </Select.Root>
+        filterPlaceholder="Filter statuses"
+        aria-label="Filter imports by status"
+        onChange={(event: DropdownChangeEvent) => onStatusFilterChange(event.value as ImportStatusFilter)}
+      />
     </label>
 
-    <DataTable.Root
+    <DataTable
       className="mc-datatable"
-      data={rows}
+      value={rows}
       dataKey="rowKey"
       selectionMode="multiple"
-      selectionKeys={selectedKeys}
-      onSelectionChange={(event: { value: Record<string, boolean> }) => onSelectionChange(event.value)}
+      selection={selectedRows}
+      onSelectionChange={handleSelection}
+      isDataSelectable={(event) => !event.data.disabled}
+      expandedRows={expandedRows}
+      onRowToggle={(event) => setExpandedRows(event.data as DataTableExpandedRows)}
+      rowExpansionTemplate={(row: ImportPreviewRow) => <ExpandedBlocks row={row} />}
       paginator
-      defaultRows={10}
+      rows={10}
       rowsPerPageOptions={[10, 25, 50]}
-      rowHover
+      paginatorTemplate="RowsPerPageDropdown CurrentPageReport PrevPageLink PageLinks NextPageLink"
+      currentPageReportTemplate="{first}–{last} of {totalRecords}"
+      emptyMessage="No mods match these filters."
+      stripedRows
+      removableSort
+      tableStyle={{ minWidth: "820px" }}
     >
-      <DataTable.TableContainer className="mc-datatable__container">
-        <DataTable.Table className="mc-datatable__table">
-          <DataTable.THead>
-            <DataTable.THeadRow>
-              <DataTable.THeadCell className="mc-datatable__toggle-column" aria-label="Expansion" />
-              <DataTable.THeadCell className="mc-datatable__select-column">
-                <DataTable.Selection>
-                  {({ isAllSelected, isSomeSelected, toggleAll }: SelectionRenderProps) =>
-                    <input
-                      type="checkbox"
-                      aria-label="Select all visible mods"
-                      checked={isAllSelected}
-                      ref={(element) => { if (element) element.indeterminate = isSomeSelected; }}
-                      onChange={toggleAll}
-                    />}
-                </DataTable.Selection>
-              </DataTable.THeadCell>
-              <DataTable.THeadCell>Mod</DataTable.THeadCell>
-              <DataTable.THeadCell>File</DataTable.THeadCell>
-              <DataTable.THeadCell>New</DataTable.THeadCell>
-              <DataTable.THeadCell>Duplicates</DataTable.THeadCell>
-              <DataTable.THeadCell>Status</DataTable.THeadCell>
-            </DataTable.THeadRow>
-          </DataTable.THead>
-          <DataTable.TBody>
-            {({ item, index }) => {
-              const row = item as unknown as ImportPreviewRow;
-              return <>
-                <DataTable.Row index={index} data-disabled={row.disabled || undefined}>
-                  <DataTable.Cell className="mc-datatable__toggle-column">
-                    <DataTable.RowToggle className="mc-datatable__toggle" aria-label={`Toggle blocks for ${row.modName}`}>
-                      <DataTable.RowToggleIndicator match="collapsed"><i className="pi pi-chevron-right" aria-hidden="true" /></DataTable.RowToggleIndicator>
-                      <DataTable.RowToggleIndicator match="expanded"><i className="pi pi-chevron-down" aria-hidden="true" /></DataTable.RowToggleIndicator>
-                    </DataTable.RowToggle>
-                  </DataTable.Cell>
-                  <DataTable.Cell className="mc-datatable__select-column">
-                    <DataTable.Selection mode="checkbox">
-                      {({ isSelected, toggle }: SelectionRenderProps) =>
-                        <input
-                          type="checkbox"
-                          aria-label={`Import ${row.modName}`}
-                          checked={isSelected}
-                          disabled={row.disabled}
-                          onChange={toggle}
-                        />}
-                    </DataTable.Selection>
-                  </DataTable.Cell>
-                  <DataTable.Cell>
-                    <strong>{row.modName}</strong>
-                    <small>{row.modId} · {row.modVersion}</small>
-                  </DataTable.Cell>
-                  <DataTable.Cell>{row.fileName}</DataTable.Cell>
-                  <DataTable.Cell><strong>{row.newCount}</strong><small>new</small></DataTable.Cell>
-                  <DataTable.Cell><strong>{row.duplicateCount}</strong><small>duplicates</small></DataTable.Cell>
-                  <DataTable.Cell><ImportStatus row={row} /></DataTable.Cell>
-                </DataTable.Row>
-                <DataTable.RowExpansion>
-                  <DataTable.Cell colSpan={7}>
-                    <ExpandedBlocks row={row} />
-                  </DataTable.Cell>
-                </DataTable.RowExpansion>
-              </>;
-            }}
-          </DataTable.TBody>
-        </DataTable.Table>
-      </DataTable.TableContainer>
-      <DataTable.Pagination>
-        {({ page, pageCount, rows: pageSize, totalRecords, canPrev, canNext, onPageChange, onRowsChange }: PaginationRenderProps) =>
-          <div className="mc-datatable__pagination">
-            <span>{totalRecords ? `${page * pageSize + 1}–${Math.min((page + 1) * pageSize, totalRecords)} of ${totalRecords}` : "0 results"}</span>
-            <label>
-              <span>Rows</span>
-              <select value={pageSize} onChange={(event) => onRowsChange(event, Number(event.target.value))}>
-                {[10, 25, 50].map((option) => <option key={option} value={option}>{option}</option>)}
-              </select>
-            </label>
-            <button type="button" aria-label="Previous page" disabled={!canPrev} onClick={(event) => onPageChange(event, page - 1)}><i className="pi pi-chevron-left" aria-hidden="true" /></button>
-            <span>Page {pageCount ? page + 1 : 0} of {pageCount}</span>
-            <button type="button" aria-label="Next page" disabled={!canNext} onClick={(event) => onPageChange(event, page + 1)}><i className="pi pi-chevron-right" aria-hidden="true" /></button>
-          </div>}
-      </DataTable.Pagination>
-    </DataTable.Root>
+      <Column expander className="mc-datatable__toggle-column" />
+      <Column selectionMode="multiple" className="mc-datatable__select-column" />
+      <Column field="modName" header="Mod" body={(row: ImportPreviewRow) => <><strong>{row.modName}</strong><small>{row.modId} · {row.modVersion}</small></>} />
+      <Column field="fileName" header="File" />
+      <Column field="newCount" header="New" body={(row: ImportPreviewRow) => <><strong>{row.newCount}</strong><small>new</small></>} />
+      <Column field="duplicateCount" header="Duplicates" body={(row: ImportPreviewRow) => <><strong>{row.duplicateCount}</strong><small>duplicates</small></>} />
+      <Column header="Status" body={(row: ImportPreviewRow) => <ImportStatus row={row} />} />
+    </DataTable>
   </>;
 }
 
