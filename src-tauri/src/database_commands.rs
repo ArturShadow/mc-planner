@@ -4,6 +4,7 @@ use tauri::State;
 use tauri_plugin_sql::{DbInstances, DbPool};
 
 use crate::mod_import::JarAnalysis;
+use std::{fs, path::PathBuf};
 
 const DATABASE_URL: &str = "sqlite:mc-planner.db";
 
@@ -100,4 +101,11 @@ pub async fn update_multiblock_atomic(instances: State<'_, DbInstances>, id: i64
         .bind(input.height_blocks).bind(input.can_share_walls).bind(id).execute(&mut *tx).await.map_err(|error| error.to_string())?;
     replace_requirements(&mut tx, id, input.requirements).await?;
     tx.commit().await.map_err(|error| error.to_string())
+}
+
+#[tauri::command]
+pub fn export_catalog_manifest(path: String, manifest: serde_json::Value) -> Result<(), String> {
+    let path = PathBuf::from(path);
+    let contents = serde_json::to_string_pretty(&manifest).map_err(|error| error.to_string())?;
+    fs::write(path, contents).map_err(|error| error.to_string())
 }

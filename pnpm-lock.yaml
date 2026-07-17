@@ -20,6 +20,12 @@ importers:
       '@tauri-apps/plugin-sql':
         specifier: ^2.4.0
         version: 2.4.0
+      primeicons:
+        specifier: ^8.0.0
+        version: 8.0.0
+      primereact:
+        specifier: ^11.0.0
+        version: 11.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       react:
         specifier: ^19.1.0
         version: 19.2.7
@@ -59,7 +65,7 @@ importers:
         version: 4.1.10(vitest@4.1.10)
       jsdom:
         specifier: ^29.1.1
-        version: 29.1.1
+        version: 29.1.1(@noble/hashes@2.2.0)
       typescript:
         specifier: ~5.8.3
         version: 5.8.3
@@ -68,7 +74,7 @@ importers:
         version: 7.3.6
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1)(vite@7.3.6)
+        version: 4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@7.3.6)
 
 packages:
 
@@ -401,6 +407,51 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
+
+  '@noble/ed25519@2.3.0':
+    resolution: {integrity: sha512-M7dvXL2B92/M7dw9+gzuydL8qn/jiqNHaoR3Q+cb1q1GHV7uwE17WCyFMG+Y+TZb5izcaXk5TdJRrDUxHXL78A==}
+
+  '@noble/hashes@2.2.0':
+    resolution: {integrity: sha512-IYqDGiTXab6FniAgnSdZwgWbomxpy9FtYvLKs7wCUs2a8RkITG+DFGO1DM9cr+E3/RgADRpFjrKVaJ1z6sjtEg==}
+    engines: {node: '>= 20.19.0'}
+
+  '@primereact/core@11.0.0':
+    resolution: {integrity: sha512-8ceGyUgGcZvbn6XMaOwdlyf6HCd6qYvD5tjrZyDKFUcvi17BiY5oPLthwZUYh1JsNiwHgKUV8B/Eo9rjI9VWyA==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@primereact/headless@11.0.0':
+    resolution: {integrity: sha512-fFNRK5xCGFwOOITgLeBQ+RC/+SWDFrTVBwkDZ6qlsHWpn8XjCVBLpA+QsYuoP2z8MkY3mk6+NnwZqi/y6YL90w==}
+
+  '@primereact/hooks@11.0.0':
+    resolution: {integrity: sha512-ohah+jaiQd2piCnY436VC4UKdQgHAdB8x5e84S9AnsNIsWVjv91htDNQ0IBdikii8zxTfSPIZCDjM5IBYqed8Q==}
+    peerDependencies:
+      react: '>=19.0.0'
+
+  '@primereact/types@11.0.0':
+    resolution: {integrity: sha512-xuioS0Ou3AOeS4PxtYULKkn4kwCMLKX/l7yxFc39YsF4cFDLBqRJzESgsKrDYm0wcZRYWGa44pAcYKwxUO/4QQ==}
+    peerDependencies:
+      '@primeuix/motion': ^1.0.0
+      '@primeuix/styled': ^1.0.0
+
+  '@primeui/license-manager@1.0.0':
+    resolution: {integrity: sha512-89J7r8cclEqoHVwjOX1adPcB/blFSocpzuYlzmd+6r0gxzg2Vd4jM54TKXt9/qwAT/kOv4vYnHKZ6hcP2GFtfA==}
+
+  '@primeuix/locale@0.1.0':
+    resolution: {integrity: sha512-/qLGiwQ/YN83GPSygKEI3cwgZ+rb0R0rNNtQrOGGaHIaG3zpkGS3QbK/qtDUi0leC69jJgY39GDX+gCeUXPKdg==}
+    engines: {node: '>=12.11.0'}
+
+  '@primeuix/motion@1.0.0':
+    resolution: {integrity: sha512-rqpFRKmUVp9BI3YQKdok0rLUwzYShXzuuxy72Kq74xYRV14eR+4+XrIXOdyVs7j7CYV0ajYowiRpJCrVgdrq6A==}
+    engines: {node: '>=12.11.0'}
+
+  '@primeuix/styled@1.0.0':
+    resolution: {integrity: sha512-6SXoeQWwKswSqTv1ygaXNfY7otHo6Rb9mxbKJK5WF8adWlZ6CtwmlNfIP+p8cH/zGccsei/5Bu7IetXlMoZGjQ==}
+    engines: {node: '>=12.11.0'}
+
+  '@primeuix/utils@0.8.0':
+    resolution: {integrity: sha512-dZSMKU2XJ7W7VDLuFMS/o4k+QYw4SYIpqSNhR/jdasMaaXl8eq0Gt7fTzTwwq7hgfmfOsI6V5xtzUUIvybOJ/w==}
+    engines: {node: '>=12.11.0'}
 
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
@@ -984,6 +1035,15 @@ packages:
     resolution: {integrity: sha512-Qb1gy5OrP5+zDf2Bvnzdl3jsTf1qXVMazbvCoKhtKqVs4/YK4ozX4gKQJJVyNe+cajNPn0KoC0MC3FUmaHWEmQ==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
 
+  primeicons@8.0.0:
+    resolution: {integrity: sha512-eZGk+Mgb4fE+LkJi9LvllbnB4RVUF9kzmnLVnT3ZMY6stqKVh7TUJ0mFoMNIEgTnJSvhaGcJotDiSvtVvkHd7g==}
+
+  primereact@11.0.0:
+    resolution: {integrity: sha512-F4m7J6Ifk2zNW3iugt/8cez7WIr+8XehiIK6uLuw7zsZQJ6FBbAFpGjAq8zr6qfp3lqbnc90zbdaU3V8oHgE4g==}
+    peerDependencies:
+      react: '>=19.0.0'
+      react-dom: '>=19.0.0'
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -1481,7 +1541,9 @@ snapshots:
   '@esbuild/win32-x64@0.28.1':
     optional: true
 
-  '@exodus/bytes@1.15.1': {}
+  '@exodus/bytes@1.15.1(@noble/hashes@2.2.0)':
+    optionalDependencies:
+      '@noble/hashes': 2.2.0
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -1501,6 +1563,61 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
+
+  '@noble/ed25519@2.3.0': {}
+
+  '@noble/hashes@2.2.0': {}
+
+  '@primereact/core@11.0.0(react@19.2.7)':
+    dependencies:
+      '@primereact/hooks': 11.0.0(react@19.2.7)
+      '@primereact/types': 11.0.0(@primeuix/motion@1.0.0)(@primeuix/styled@1.0.0)
+      '@primeui/license-manager': 1.0.0
+      '@primeuix/locale': 0.1.0
+      '@primeuix/motion': 1.0.0
+      '@primeuix/styled': 1.0.0
+      '@primeuix/utils': 0.8.0
+      react: 19.2.7
+
+  '@primereact/headless@11.0.0(react@19.2.7)':
+    dependencies:
+      '@primereact/core': 11.0.0(react@19.2.7)
+      '@primereact/hooks': 11.0.0(react@19.2.7)
+      '@primeui/license-manager': 1.0.0
+      '@primeuix/styled': 1.0.0
+      '@primeuix/utils': 0.8.0
+    transitivePeerDependencies:
+      - react
+
+  '@primereact/hooks@11.0.0(react@19.2.7)':
+    dependencies:
+      '@primeuix/utils': 0.8.0
+      react: 19.2.7
+
+  '@primereact/types@11.0.0(@primeuix/motion@1.0.0)(@primeuix/styled@1.0.0)':
+    dependencies:
+      '@primeuix/motion': 1.0.0
+      '@primeuix/styled': 1.0.0
+
+  '@primeui/license-manager@1.0.0':
+    dependencies:
+      '@noble/ed25519': 2.3.0
+      '@noble/hashes': 2.2.0
+
+  '@primeuix/locale@0.1.0':
+    dependencies:
+      '@primeuix/utils': 0.8.0
+
+  '@primeuix/motion@1.0.0':
+    dependencies:
+      '@primeuix/utils': 0.8.0
+
+  '@primeuix/styled@1.0.0':
+    dependencies:
+      '@primeui/license-manager': 1.0.0
+      '@primeuix/utils': 0.8.0
+
+  '@primeuix/utils@0.8.0': {}
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
@@ -1740,7 +1857,7 @@ snapshots:
       obug: 2.1.3
       std-env: 4.2.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1)(vite@7.3.6)
+      vitest: 4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@7.3.6)
 
   '@vitest/expect@4.1.10':
     dependencies:
@@ -1830,10 +1947,10 @@ snapshots:
 
   csstype@3.2.3: {}
 
-  data-urls@7.0.0:
+  data-urls@7.0.0(@noble/hashes@2.2.0):
     dependencies:
       whatwg-mimetype: 5.0.0
-      whatwg-url: 16.0.1
+      whatwg-url: 16.0.1(@noble/hashes@2.2.0)
     transitivePeerDependencies:
       - '@noble/hashes'
 
@@ -1903,9 +2020,9 @@ snapshots:
 
   has-flag@4.0.0: {}
 
-  html-encoding-sniffer@6.0.0:
+  html-encoding-sniffer@6.0.0(@noble/hashes@2.2.0):
     dependencies:
-      '@exodus/bytes': 1.15.1
+      '@exodus/bytes': 1.15.1(@noble/hashes@2.2.0)
     transitivePeerDependencies:
       - '@noble/hashes'
 
@@ -1932,17 +2049,17 @@ snapshots:
 
   js-tokens@4.0.0: {}
 
-  jsdom@29.1.1:
+  jsdom@29.1.1(@noble/hashes@2.2.0):
     dependencies:
       '@asamuzakjp/css-color': 5.1.11
       '@asamuzakjp/dom-selector': 7.1.1
       '@bramus/specificity': 2.4.2
       '@csstools/css-syntax-patches-for-csstree': 1.1.6(css-tree@3.2.1)
-      '@exodus/bytes': 1.15.1
+      '@exodus/bytes': 1.15.1(@noble/hashes@2.2.0)
       css-tree: 3.2.1
-      data-urls: 7.0.0
+      data-urls: 7.0.0(@noble/hashes@2.2.0)
       decimal.js: 10.6.0
-      html-encoding-sniffer: 6.0.0
+      html-encoding-sniffer: 6.0.0(@noble/hashes@2.2.0)
       is-potential-custom-element-name: 1.0.1
       lru-cache: 11.5.2
       parse5: 8.0.1
@@ -1953,7 +2070,7 @@ snapshots:
       w3c-xmlserializer: 5.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
-      whatwg-url: 16.0.1
+      whatwg-url: 16.0.1(@noble/hashes@2.2.0)
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - '@noble/hashes'
@@ -2017,6 +2134,15 @@ snapshots:
       ansi-regex: 5.0.1
       ansi-styles: 5.2.0
       react-is: 17.0.2
+
+  primeicons@8.0.0: {}
+
+  primereact@11.0.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+    dependencies:
+      '@primereact/core': 11.0.0(react@19.2.7)
+      '@primereact/headless': 11.0.0(react@19.2.7)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
 
   punycode@2.3.1: {}
 
@@ -2143,7 +2269,7 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.3
 
-  vitest@4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1)(vite@7.3.6):
+  vitest@4.1.10(@vitest/coverage-v8@4.1.10)(jsdom@29.1.1(@noble/hashes@2.2.0))(vite@7.3.6):
     dependencies:
       '@vitest/expect': 4.1.10
       '@vitest/mocker': 4.1.10(vite@7.3.6)
@@ -2167,7 +2293,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@vitest/coverage-v8': 4.1.10(vitest@4.1.10)
-      jsdom: 29.1.1
+      jsdom: 29.1.1(@noble/hashes@2.2.0)
     transitivePeerDependencies:
       - msw
 
@@ -2179,9 +2305,9 @@ snapshots:
 
   whatwg-mimetype@5.0.0: {}
 
-  whatwg-url@16.0.1:
+  whatwg-url@16.0.1(@noble/hashes@2.2.0):
     dependencies:
-      '@exodus/bytes': 1.15.1
+      '@exodus/bytes': 1.15.1(@noble/hashes@2.2.0)
       tr46: 6.0.0
       webidl-conversions: 8.0.1
     transitivePeerDependencies:

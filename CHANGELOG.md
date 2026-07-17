@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - The multiblock block picker groups available blocks by mod, with separate Minecraft and manual categories.
 - Imported sources and multiblocks use independent bounded scroll areas.
 - The process editor uses a Photoshop-style tool palette with searchable, grouped, progressively loaded placement elements.
+- Import previews use one expandable, progressively rendered block list per mod and can export a reusable JSON analysis manifest.
 
 ### Added
 

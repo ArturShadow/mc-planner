@@ -35,7 +35,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .invoke_handler(tauri::generate_handler![greet, mod_import::collect_mod_jar_paths, mod_import::scan_mod_jars,
             database_commands::import_catalog_jars, database_commands::create_multiblock_atomic,
-            database_commands::update_multiblock_atomic])
+            database_commands::update_multiblock_atomic, database_commands::export_catalog_manifest])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

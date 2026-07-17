@@ -8,7 +8,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { open } from "@tauri-apps/plugin-dialog";
 
 vi.mock("@tauri-apps/api/core", () => ({ invoke: vi.fn() }));
-vi.mock("@tauri-apps/plugin-dialog", () => ({ open: vi.fn() }));
+vi.mock("@tauri-apps/plugin-dialog", () => ({ open: vi.fn(), save: vi.fn() }));
 vi.mock("@tauri-apps/api/window", () => ({ getCurrentWindow: () => ({ onDragDropEvent: vi.fn().mockResolvedValue(vi.fn()) }) }));
 vi.mock("./catalog.repository", () => ({
   createMultiblock: vi.fn(), updateMultiblock: vi.fn(), deleteMultiblock: vi.fn(), importJarAnalyses: vi.fn(), listCatalogIdentifiers: vi.fn(), listCatalogSources: vi.fn(),
@@ -40,7 +40,8 @@ describe("CatalogView", () => {
     await user.click(screen.getByRole("button", { name: "Select JAR files" }));
     expect(await screen.findByRole("heading", { name: "Import preview" })).toBeInTheDocument();
     expect(screen.getByText("1 new block selected")).toBeInTheDocument();
-    expect(screen.getAllByRole("cell", { name: "1" })).toHaveLength(2);
+    await user.click(screen.getByText("Example Mod"));
+    expect(screen.getByText("example:new_machine")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Import selected" }));
     await waitFor(() => expect(importJarAnalyses).toHaveBeenCalledWith(project, [expect.objectContaining({ modId: "example" })]));
     expect(await screen.findByText("1 new block imported.")).toBeInTheDocument();
