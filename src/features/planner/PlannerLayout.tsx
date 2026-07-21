@@ -2,8 +2,9 @@ import { useState } from "react";
 import type { ProjectModel } from "../../models/project.model";
 import { BasePlanningView } from "../base/BasePlanningView";
 import { ProcessView } from "../processes/ProcessView";
+import { CatalogView } from "../catalog/CatalogView";
 
-type PlannerTab = "base" | "processes" | "multiblocks";
+type PlannerTab = "base" | "processes" | "catalog";
 interface ProcessNavigationRequest { processId: number | null; nonce: number }
 
 interface PlannerLayoutProps {
@@ -15,20 +16,13 @@ interface PlannerLayoutProps {
 const tabs: Array<{ id: PlannerTab; label: string; symbol: string }> = [
   { id: "base", label: "Base", symbol: "▦" },
   { id: "processes", label: "Processes", symbol: "⇄" },
-  { id: "multiblocks", label: "Multiblocks", symbol: "⬡" },
+  { id: "catalog", label: "Catalog", symbol: "⬡" },
 ];
-
-const emptyContent: Record<PlannerTab, { title: string; description: string }> = {
-  base: { title: "Your base is ready to be planned", description: "Arrange chunks and reserve space for every part of your build." },
-  processes: { title: "No processes yet", description: "Production chains and technical workflows will appear here." },
-  multiblocks: { title: "No multiblocks yet", description: "Keep track of large structures and their material requirements." },
-};
 
 export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange }: PlannerLayoutProps) {
   const [activeTab, setActiveTab] = useState<PlannerTab>("base");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [processNavigation, setProcessNavigation] = useState<ProcessNavigationRequest | null>(null);
-  const content = emptyContent[activeTab];
 
   function openProcess(processId: number | null): void {
     setProcessNavigation({ processId, nonce: Date.now() });
@@ -78,11 +72,7 @@ export function PlannerLayout({ project, onCloseProject, onProjectBaseSizeChange
           <span className="planner__status">Local draft</span>
         </header>
 
-        {activeTab === "base" ? <BasePlanningView project={project} onProjectBaseSizeChange={onProjectBaseSizeChange} onOpenProcess={openProcess} /> : activeTab === "processes" ? <ProcessView project={project} navigationRequest={processNavigation} /> : <section className="planner__empty" aria-labelledby="planner-empty-title">
-          <div className="planner__empty-grid" aria-hidden="true"><span>◆</span></div>
-          <h2 id="planner-empty-title">{content.title}</h2>
-          <p>{content.description}</p>
-        </section>}
+        {activeTab === "base" ? <BasePlanningView project={project} onProjectBaseSizeChange={onProjectBaseSizeChange} onOpenProcess={openProcess} /> : activeTab === "processes" ? <ProcessView project={project} navigationRequest={processNavigation} /> : <CatalogView project={project} />}
       </main>
     </div>
   );

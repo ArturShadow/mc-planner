@@ -5,6 +5,7 @@ import { PlannerLayout } from "./PlannerLayout";
 import type { ProjectModel } from "../../models/project.model";
 
 vi.mock("../processes/ProcessView", () => ({ ProcessView: () => <section><h2>Process editor</h2></section> }));
+vi.mock("../catalog/CatalogView", () => ({ CatalogView: () => <section><h2>Mod block catalog</h2></section> }));
 
 const project: ProjectModel = {
   id: 7,
@@ -31,8 +32,8 @@ describe("PlannerLayout navigation", () => {
     expect(screen.getByRole("heading", { name: "Process editor" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Processes" })).toHaveAttribute("aria-current", "page");
 
-    await user.click(screen.getByRole("button", { name: "Multiblocks" }));
-    expect(screen.getByRole("heading", { name: "No multiblocks yet" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Catalog" }));
+    expect(screen.getByRole("heading", { name: "Mod block catalog" })).toBeInTheDocument();
   });
 
   it("returns to the projects screen", async () => {
